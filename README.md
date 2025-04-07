@@ -141,7 +141,7 @@ src/ → Raiz
 
    ```bash
    git clone https://github.com/MarcosNasc/product-management-api.git
-   cd product-management-api
+   cd product-management-api\src
    ```
 
 2. Suba os containers com:
