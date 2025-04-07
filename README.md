@@ -96,10 +96,10 @@ Este documento descreve os principais padrões e boas práticas utilizados na ar
 
 ```txt
 src/ → Raiz
-├─ ProductManagement.API** → Projeto da WebAPI
-├─ ProductManagement.Application** → UseCases e contratos de serviço
-├─ ProductManagement.Domain** → Entidades e lógica de negócio
-└─ ProductManagement.Infrastructure** → Acesso a dados e serviços externos
+├─ ProductManagement.API → Projeto da WebAPI
+├─ ProductManagement.Application → UseCases e contratos de serviço
+├─ ProductManagement.Domain → Entidades e lógica de negócio
+└─ ProductManagement.Infrastructure → Acesso a dados e serviços externos
 ```
 
 ---
