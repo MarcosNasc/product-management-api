@@ -1,94 +1,83 @@
-# 🛠️ Product Management API
+# 📦 Product Management API
 
 API para gerenciamento de produtos, desenvolvida como parte de um desafio técnico, com arquitetura limpa, integração com banco de dados PostgreSQL e armazenamento de imagens simulando o serviço AWS S3 via LocalStack.
 
 ---
 
-## 🧱 Arquitetura do Projeto - Padrões e Boas Práticas
+## 📐 Arquitetura do Projeto
 
-Este documento descreve os principais padrões e boas práticas utilizados na arquitetura do projeto, com o objetivo de manter o código limpo, organizado, escalável e de fácil manutenção. O projeto segue os princípios da **Clean Architecture** e **Domain Drive Design**, com separação clara de responsabilidades entre as camadas:
+Este projeto adota Clean Architecture com princípios de Domain-Driven Design (DDD). A separação entre as camadas garante um código limpo, desacoplado e de fácil manutenção:
 
-- **Domain**: Entidades e regras de negócio puras, sem dependências.
-- **Application**: Casos de uso (UseCases), interfaces e contratos.
-- **Infrastructure**: Implementações concretas de serviços externos (banco de dados, armazenamento, etc).
-- **API**: Interface pública da aplicação (Web API), configuração de middlewares, DI, controllers, etc.
-
----
-
-## ⚖️ Princípios Adotados
-
-### 1. Command-Query Separation (CQS)
-
-- **Comandos**: Responsáveis por alterar o estado da aplicação (ex: `CreateProductCommand`).
-- **Consultas**: Responsáveis apenas por leitura (ex: `GetAllProductsQuery`).
-- Handlers separados para cada operação.
-  > ❗ Este projeto **não utiliza CQRS**, apenas o princípio CQS (separação entre comandos e consultas), mantendo uma estrutura mais simples e coesa.
+```text
+[Controller]
+   ↓
+[UseCase Handler]
+   ↓
+[Repository Interface]
+   ↓
+[Infra Repository + Services]
+   ↓
+[PostgreSQL / S3 (via LocalStack)]
+```
 
 ---
 
-### 2. DTOs Específicos da Camada de API
+## 🧠 Princípios SOLID Aplicados
 
-- Objetos de transporte como `CreateProductWithImageRequest` e `EditProductWithImageRequest`.
-- Usados para receber dados dos endpoints .
-- Possuem métodos `ToCommand()` para conversão em comandos da camada de aplicação.
-- Possuem métodos `Validate()` para validar a entrada de dados
+Este projeto aplica os 5 princípios do SOLID:
 
----
+- 💡 **SRP**: Camadas com responsabilidade única (Controller, UseCase, DTO, Repository).
+- 💡 **OCP**: Componentes como ApiResult<T> e DTOs extensíveis sem modificar lógica.
+- 💡 **LSP**: DTOs substituíveis por suas interfaces sem impactar os consumidores.
+- 💡 **ISP**: Interfaces enxutas como IStorageService, IRequestValidator.
+- 💡 **DIP**: Application depende de abstrações; injeção de dependência nas controllers.
 
-### 3. Record Types para Imutabilidade
+## 📏 Padrões e Boas Práticas
 
-- Utiliza `record class` em DTOs e Commands.
-- Favorece comparação estrutural e imutabilidade.
+### ✅ Command-Query Separation (CQS)
 
----
-
-### 4. Responsabilidade Única (SRP - SOLID)
-
-- Controllers só orquestram.
-- DTOs recebem entrada de dados e faz a validação.
-- Commands representam intenções/Ações.
-- UseCases executam lógica de negócio.
+- **Comandos**: Alteram o estado da aplicação (ex: CreateProductCommand).
+- **Consultas**: São apenas leitura (ex: GetAllProductsQuery).
+- **Handlers**: Cada operação tem seu próprio handler.
+  > ℹ️ O projeto não implementa CQRS completo, apenas a separação entre leitura e escrita (CQS).
 
 ---
 
-### 5. UseCases como Camada de Aplicação
+### ✅ DTOs Específicos da Camada de API
 
-- Cada caso de uso é representado por uma classe dedicada (ex: `CreateProductUseCaseHandler`).
-- Isola a lógica da aplicação das controllers.
-
----
-
-### 7. Organização por Feature
-
-- Diretórios por contexto de negócio: `Product/Commands`, `Category/Queries`, etc.
+- DTOs como CreateProductWithImageRequest encapsulam os dados de entrada.
+- Possuem métodos ToCommand() e Validate(), facilitando a conversão para a camada de aplicação e a validação de dados.
 
 ---
 
-### 9. Interfaces para Abstração
+### ✅ Record Types para Imutabilidade
 
-- `IProductImageRequest` para padronizar acesso a `Image` entre diferentes DTOs.
-- `IRequestValidator` para padronizar a validação entre diferentes DTOs.
-
----
-
-### 10. ApiResult<T> como Wrapper de Resposta
-
-- Retornos da API padronizados com `ApiResult<T>`.
-- Sucesso, falha, mensagens e payload sempre consistentes.
+- Utiliza record class em DTOs e Commands, promovendo imutabilidade e legibilidade.
 
 ---
 
-### 11. Injeção de Dependência
+### ✅ UseCases como Camada de Aplicação
 
-- UseCases e services injetados nas controllers.
-- Favorece teste e desacoplamento.
+- Cada operação é tratada em um UseCaseHandler, centralizando a lógica e desacoplando das controllers.
 
 ---
 
-### 12. Upload de Arquivos Isolado
+### ✅ Organização por Feature
 
-- Upload de imagens é tratado por um serviço (`_storageService`) fora da lógica do Command.
-- A imagem é processada, a URL é enviada ao `Command`.
+- Diretórios separados por domínio: Product/Commands, Category/Queries, etc.
+  Isso facilita a escalabilidade e o entendimento por contexto.
+
+---
+
+### ✅ ApiResult<T> como Wrapper de Resposta
+
+- Todas as respostas seguem o mesmo padrão: sucesso, falha, mensagens e payloads consistentes.
+
+---
+
+### ✅ Upload de Arquivos Isolado
+
+- Upload de imagens é tratado por um serviço externo (IStorageService), mantendo os Commands limpos.
 
 ---
 
@@ -96,22 +85,22 @@ Este documento descreve os principais padrões e boas práticas utilizados na ar
 
 ```txt
 src/ → Raiz
-├─ ProductManagement.API → Projeto da WebAPI
+├─ ProductManagement.API → Web API (controllers, DI, configuração)
 ├─ ProductManagement.Application → UseCases e contratos de serviço
 ├─ ProductManagement.Domain → Entidades e lógica de negócio
-└─ ProductManagement.Infrastructure → Acesso a dados e serviços externos
+└─ ProductManagement.Infrastructure → Repositórios  e serviços externos
 ```
 
 ---
 
-## 🚀 Tecnologias Utilizadas
+## 🧰 Tecnologias Utilizadas
 
-- [.NET 8](https://dotnet.microsoft.com/)
-- **PostgreSQL** via Docker
-- **Entity Framework Core** (ORM e Migrations)
-- **Amazon S3** (simulado via [LocalStack](https://github.com/localstack/localstack))
-- **Docker & Docker Compose** (ambiente de desenvolvimento completo)
-- **Swagger (Swashbuckle)** para documentação da API
+- ⚙️ [.NET 8](https://dotnet.microsoft.com/)
+- 🐘 **PostgreSQL** via Docker
+- ⚙️ **Entity Framework Core** (ORM e Migrations)
+- ☁️ **Amazon S3** (simulado via [LocalStack](https://github.com/localstack/localstack))
+- 🐳 **Docker & Docker Compose** (ambiente de desenvolvimento completo)
+- 📘 **Swagger (Swashbuckle)** para documentação da API
 
 ---
 
@@ -121,6 +110,21 @@ src/ → Raiz
 
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
+
+> ℹ️ **Dependências para o script `localstack-init.sh`:**  
+> Para rodar o script que inicializa o ambiente LocalStack (como a criação do bucket `product-images`), é necessário ter:
+>
+> - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) instalado
+> - [awslocal](https://github.com/localstack/awscli-local) instalado (`pip install awscli-local`)
+>
+> O script `localstack-init.sh` executa comandos como `awslocal s3 mb s3://product-images`, portanto certifique-se de que essas ferramentas estão disponíveis no ambiente.
+
+## 🐘 Inicialização do banco de dados
+
+O script `database-init.sh` é executado automaticamente no container da API e é responsável por aplicar as migrations no banco PostgreSQL ao subir o ambiente com Docker.
+
+⚠️ **Importante**:  
+Esse script só roda corretamente se o banco de dados (`postgres`) estiver acessível na porta 5432. Ele usa o comando `nc` (netcat) para aguardar até que a conexão esteja disponível. Esse script é executado automaticamente via Dockerfile. Ele aplica as migrations e inicia a API logo em seguida.
 
 ### 📦Serviços via Docker
 
@@ -132,10 +136,10 @@ src/ → Raiz
 
 > 💡 **Observação:**  
 > A aplicação está rodando com **HTTPS** na porta **443** (com um certificado já incluído no projeto).  
-> redireciona automaticamente requisições HTTP (porta 8080) para HTTPS (porta 443).
+> Redireciona automaticamente requisições HTTP (porta 8080) para HTTPS (porta 443).
 > Você pode ter que aceitar o certificado na primeira vez que acessar via navegador.
 
-### 🖼️ Upload de Imagens
+### 🪣 Upload de Arquivos
 
 - As imagens de produtos são armazenadas no bucket S3 **product-images** simulado no LocalStack.
 - Durante a inicialização, o bucket é criado automaticamente via script.
