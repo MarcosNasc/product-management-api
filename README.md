@@ -124,11 +124,16 @@ src/ → Raiz
 
 ### 📦Serviços via Docker
 
-| Serviço           | Porta | Descrição                        |
-| ----------------- | ----- | -------------------------------- |
-| ProductManagement | 5000  | API REST com suporte a Swagger   |
-| PostgreSQL        | 5432  | Banco de dados relacional        |
-| LocalStack        | 4566  | Simulador local dos serviços AWS |
+| Serviço           | Porta                    | Descrição                        |
+| ----------------- | ------------------------ | -------------------------------- |
+| ProductManagement | Http:8080 <br> Https:443 | API REST com suporte a Swagger   |
+| PostgreSQL        | 5432                     | Banco de dados relacional        |
+| LocalStack        | 4566                     | Simulador local dos serviços AWS |
+
+> 💡 **Observação:**  
+> A aplicação está rodando com **HTTPS** na porta **443** (com um certificado já incluído no projeto).  
+> redireciona automaticamente requisições HTTP (porta 8080) para HTTPS (porta 443).
+> Você pode ter que aceitar o certificado na primeira vez que acessar via navegador.
 
 ### 🖼️ Upload de Imagens
 
@@ -153,7 +158,7 @@ src/ → Raiz
 3. Acesse o Swagger da API em:
 
    ```bash
-   http://localhost:5000/swagger
+   http://localhost/swagger
    ```
 
 ## 📌 Autor
