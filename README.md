@@ -6,21 +6,9 @@ API para gerenciamento de produtos, desenvolvida como parte de um desafio técni
 
 ## 📐 Arquitetura do Projeto
 
-Este projeto adota Clean Architecture com princípios de Domain-Driven Design (DDD). A separação entre as camadas garante um código limpo, desacoplado e de fácil manutenção:
+O diagrama abaixo mostra como os componentes do sistema estão organizados em camadas, seguindo os princípios de Clean Architecture, e como eles se integram com serviços externos como PostgreSQL e LocalStack (S3 Simulation).
 
-```text
-[Controller]
-   ↓
-[UseCase Handler]
-   ↓
-[Repository Interface]
-   ↓
-[Infra Repository + Services]
-   ↓
-[PostgreSQL / S3 (via LocalStack)]
-```
-
----
+## ![Diagrama da Arquitetura](diagram.png)
 
 ## 📏 Padrões e Boas Práticas
 
