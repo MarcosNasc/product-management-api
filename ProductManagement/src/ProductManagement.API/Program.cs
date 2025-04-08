@@ -27,8 +27,8 @@ using (var scope = app.Services.CreateScope())
     context.Database.Migrate(); 
 }
 
-// redirecionamento Https comentado por causa do container docker que precisa de um certificado válido
-//app.UseHttpsRedirection();
+
+app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

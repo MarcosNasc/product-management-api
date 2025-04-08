@@ -1,7 +1,10 @@
 # Imagem base para runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-EXPOSE 5000
+
+# Expõe HTTP e HTTPS
+EXPOSE 8080
+EXPOSE 443
 
 # Imagem para build e instalação do EF CLI
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
@@ -50,8 +53,16 @@ COPY --from=publish /app/publish .
 # Copia os sources pro EF funcionar
 COPY --from=build /src /src
 
+# Copia o certificado .pfx para dentro do container
+COPY ProductManagement.API/https/aspnetapp.pfx /https/aspnetapp.pfx
+
 # Copia o script de entrypoint e dá permissão
 COPY database-init.sh .
 RUN chmod +x ./database-init.sh
+
+# Define as variáveis de ambiente do Kestrel para HTTPS
+ENV ASPNETCORE_Kestrel__Certificates__Default__Password=local
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+ENV ASPNETCORE_URLS="https://+:443;http://+:8080"
 
 ENTRYPOINT ["./database-init.sh"]

@@ -23,7 +23,6 @@ services:
       - postgres
       - localstack   
     environment:
-      - ASPNETCORE_URLS=http://+:5000
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=ProductManagement;Username=postgres;Password=123456
       - ASPNETCORE_ENVIRONMENT=Development 
       - AWS_SERVICE_URL=http://localstack:4566 
@@ -32,7 +31,8 @@ services:
       - AWS_SECRET_ACCESS_KEY=test
       - AWS_REGION=us-east-1
     ports:
-      - "5000:5000"
+      - "8080:8080"
+      - "443:443"
     restart: always
   
   localstack:
