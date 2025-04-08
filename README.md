@@ -22,17 +22,45 @@ Este projeto adota Clean Architecture com princípios de Domain-Driven Design (D
 
 ---
 
-## 🧠 Princípios SOLID Aplicados
+## 📏 Padrões e Boas Práticas
 
 Este projeto aplica os 5 princípios do SOLID:
 
-- 💡 **SRP**: Camadas com responsabilidade única (Controller, UseCase, DTO, Repository).
-- 💡 **OCP**: Componentes como ApiResult<T> e DTOs extensíveis sem modificar lógica.
-- 💡 **LSP**: DTOs substituíveis por suas interfaces sem impactar os consumidores.
-- 💡 **ISP**: Interfaces enxutas como IStorageService, IRequestValidator.
-- 💡 **DIP**: Application depende de abstrações; injeção de dependência nas controllers.
+- 💡 **SRP**: Cada componente do sistema tem uma responsabilidade única, facilitando a manutenção e evolução do código:
+- `Controllers`: expõem endpoints HTTP e delegam a lógica para os UseCases.
+- `DTOs`: encapsulam os dados de entrada e saída, além de conter validações específicas da camada de API.
+- `UseCases`: concentram a lógica de negócio de cada operação.
+- `Commands` e `Queries`: representam intenções claras de alterar ou consultar dados.
+- `Repositories`: abstraem o acesso ao banco de dados.
+- `Services`: tratam responsabilidades externas ou auxiliares.
 
-## 📏 Padrões e Boas Práticas
+---
+
+- 💡 **OCP**: Componentes abertos para extensão e fechados para modificação:
+  - `ApiResult<T>` e `Result<T>` permitem novos padrões de resposta sem alterar sua estrutura base.
+  - DTOs possuem métodos como `ToCommand()` e `Validate()`, permitindo adicionar validações e conversões sem modificar a lógica existente.
+  - Repositórios genéricos oferecem operações básicas reutilizáveis, enquanto repositórios específicos estendem o comportamento conforme necessário.
+  - Interfaces como `IStorageService` facilitam a troca de implementações (ex: S3, Local) sem alterar os consumidores.
+
+---
+
+- 💡 **LSP**: Objetos derivados ou implementações concretas podem substituir suas abstrações sem alterar o comportamento esperado pelos consumidores:
+
+  - `IProductRepository` pode ser substituído por `ProductRepository` sem quebrar os UseCases que a consomem.
+  - `IStorageService` pode ser implementado por `S3StorageService` (produção) ou `LocalStorageService` (dev/teste), mantendo o contrato.
+  - `IRequestValidator<T>` permite validar diferentes tipos de DTOs sem alterar os pontos que usam validação.
+  - DTOs como `CreateProductRequest` e `UpdateProductRequest` implementam a interface `IRequestValidator`, permitindo que sejam usados de forma intercambiável por serviços que esperam um validador genérico, sem comprometer o comportamento esperado.
+
+---
+
+- 💡 **ISP**: Nenhum cliente deve ser forçado a depender de métodos que não utiliza
+  - Interfaces como `IStorageService` e `IRequestValidator` são pequenas e específicas, permitindo que cada implementação dependa apenas dos métodos que realmente precisa.Isso evita acoplamento desnecessário e torna o código mais modular e fácil de manter.
+
+---
+
+- 💡 **DIP**: Dependa de abstrações, não de implementações concretas.
+  - A aplicação depende apenas de abstrações, como `IProductRepository` e `IStorageService`, facilitando a inversão de controle e a testabilidade.  
+    As implementações concretas são injetadas via Dependency Injection nas controllers e serviços.
 
 ### ✅ Command-Query Separation (CQS)
 
@@ -52,7 +80,7 @@ Este projeto aplica os 5 princípios do SOLID:
 
 ### ✅ Record Types para Imutabilidade
 
-- Utiliza record class em DTOs e Commands, promovendo imutabilidade e legibilidade.
+- Utiliza record class em DTOs e Commands, promovendo imutabilidade.
 
 ---
 
